@@ -1,76 +1,81 @@
-import {Line} from 'rc-progress'
+import {Component} from 'react'
+import {BiArrowBack} from 'react-icons/bi'
+import {Link} from 'react-router-dom'
+import MemoryMatrixGame from '../MemoryMatrixGame'
 import './index.css'
 
-const MemoryMatrixProgressBar = props => {
-  const {level, onClickPlayAgain} = props
-  const percentage = (level * 100) / 15
-  return (
-    <div className="progressbar-bg">
-      <div className="progrssbar-emojis-container">
+class MemoryMatrixRoute extends Component {
+  state = {showGame: false}
+
+  onClickPlayButton = () => {
+    this.setState({showGame: true})
+  }
+
+  renderRuleView = () => (
+    <div className="memory-matrix-home-bg">
+      <Link to="/">
+        <button className="back-btn" type="button">
+          <BiArrowBack color="#ffffff" />
+          <p>Back</p>
+        </button>
+      </Link>
+      <h1 className="game-heading">Memory Matrix</h1>
+      <div>
         <img
-          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000742/05_Pokerface_xnvjfb.png"
-          alt="neutral face"
-          className="progressbar-emoji"
-        />
-        <img
-          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000801/07_Grimmace_n4lx7r.png"
-          alt="grimacing face"
-          className="progressbar-emoji"
-        />
-        <img
-          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000716/01_Smile_wuwllh.png"
-          alt="slightly smiling face"
-          className="progressbar-emoji"
-        />
-        <img
-          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000762/03_Optimistic_wzbf7s.png"
-          alt="grinning face with big eyes"
-          className="progressbar-emoji"
-        />
-        <img
-          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000826/04_Grin_rmlxkc.png"
-          alt="grinning face with smiling eyes"
-          className="progressbar-emoji"
-        />
-        <img
-          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000848/05_Laugh_qatkkp.png"
-          alt="beaming face with smiling eyes"
-          className="progressbar-emoji"
-        />
-        <img
-          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000870/02_Happy_fciroi.png"
-          alt="grinning face"
-          className="progressbar-emoji"
-        />
-        <img
-          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000891/02_Like_a_boss_cjrvqq.png"
-          alt="smiling face with sunglasses"
-          className="progressbar-emoji"
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1708940282/memory_umdawk.png"
+          alt="memory matrix"
+          className="memory-matrix-image"
         />
       </div>
-      <Line
-        percent={percentage}
-        strokeWidth={4}
-        strokeColor="blue"
-        className="progress-bar"
-      />
-      <div className="levels-container">
-        <p className="level-heading">level 1</p>
-        <p className="level-heading">level 5</p>
-        <p className="level-heading">level 10</p>
-        <p className="level-heading">level 15</p>
-      </div>
-      <h1 className="congratulations-heading">Congratulations</h1>
-      <h1 className="description-heading">You have reached level {level}</h1>
+      <h1 className="rules-heading">Rules</h1>
+      <ul className="rules-list">
+        <li className="memory-matrix-rule-item">
+          In each level of the Game, Users should be able to see the Grid with
+          (N X N) size starting from 3 and the grid will highlight N cells in
+          Blue, the N highlighted cells will be picked randomly.
+        </li>
+        <li className="memory-matrix-rule-item">
+          The highlighted cells will remain N seconds for the user to memorize
+          the cells. At this point, the user should not be able to perform any
+          action.
+        </li>
+        <li className="memory-matrix-rule-item">
+          After N seconds, the grid will clear the N highlighted cells.
+        </li>
+        <li className="memory-matrix-rule-item">
+          At N seconds, the user can click on any cell. Clicking on a cell that
+          was highlighted before it will turn blue. Clicking on the other cells
+          that were not highlighted before then will turn to red.
+        </li>
+        <li className="memory-matrix-rule-item">
+          The user should be promoted to the next level if they guess all N
+          cells correctly in one attempt.
+        </li>
+        <li className="memory-matrix-rule-item">
+          The user should be taken to the results page if the user clicks on the
+          wrong cell.
+        </li>
+        <li className="memory-matrix-rule-item">
+          If the user completed all the levels, then the user should be taken to
+          the results page.
+        </li>
+      </ul>
+
       <button
         type="button"
-        className="play-again-button"
-        onClick={onClickPlayAgain}
+        className="memory-matrix-start-btn"
+        onClick={this.onClickPlayButton}
       >
-        Play Again
+        Start Playing
       </button>
     </div>
   )
+
+  render() {
+    const {showGame} = this.state
+
+    return showGame ? <MemoryMatrixGame /> : this.renderRuleView()
+  }
 }
 
-export default MemoryMatrixProgressBar
+export default MemoryMatrixRoute
