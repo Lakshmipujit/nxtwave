@@ -1,56 +1,62 @@
+import {Component} from 'react'
 import './index.css'
 
-import {Link} from 'react-router-dom'
+class Cell extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      shouldShowHiddenCells: true,
+    }
+    this.timerId = null
+  }
 
-const Home = () => (
-  <div className="home-container">
-    <h1 className="games-heading">Games</h1>
-    <ul className="games-container">
-      <li className="home-list-item">
-        <Link to="/emoji-game" className="link-styling">
-          <div className="eachGame">
-            <img
-              src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729257912/Group_7471_w4hbbx.png"
-              alt="emoji game"
-            />
-          </div>
-        </Link>
-      </li>
-      <li className="home-list-item">
-        <Link to="/memory-matrix" className="link-styling">
-          <div className="eachGame">
-            <h1 className="memory-matrix-heading">Memory Matrix</h1>
-            <img
-              src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729259272/memory_fv4c6f.png"
-              alt="memory matrix"
-            />
-          </div>
-        </Link>
-      </li>
-      <li className="home-list-item">
-        <Link to="/rock-paper-scissor" className="link-styling">
-          <div className="eachGame">
-            <h1 className="rock-paper-scissor">ROCK PAPER SCISSOR</h1>
-            <img
-              src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729259510/Group_7469_p76ztk.png"
-              alt="rock paper scissor"
-            />
-          </div>
-        </Link>
-      </li>
-      <li className="home-list-item">
-        <Link to="/card-flip-memory-game" className="link-styling">
-          <div className="eachGame">
-            <img
-              src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729259729/animals_fjhgr1.png"
-              alt="card flip memory game"
-              className="flip-home-icon"
-            />
-          </div>
-        </Link>
-      </li>
-    </ul>
-  </div>
-)
+  componentDidMount() {
+    const {hiddenCellsDisplayTime} = this.props
+    this.timerId = setTimeout(() => {
+      // Store the timerId
+      this.setState({shouldShowHiddenCells: false})
+    }, hiddenCellsDisplayTime)
+  }
 
-export default Home
+  componentWillUnmount() {
+    clearTimeout(this.timerId) // Clear the timer in componentWillUnmount
+  }
+
+  render() {
+    const {isHidden, isClicked, onClick} = this.props
+    const {shouldShowHiddenCells} = this.state
+    const cellStyle = {}
+    let dataTestid = ''
+    if (isClicked) {
+      if (isHidden) {
+        cellStyle.backgroundColor = 'red'
+      } else {
+        cellStyle.backgroundColor = 'blue'
+      }
+    }
+
+    if (isHidden) {
+      dataTestid = 'highlighted'
+    } else {
+      dataTestid = 'notHighlighted'
+    }
+    return (
+      <li>
+        <button
+          className={`cell ${
+            isHidden && shouldShowHiddenCells ? 'highlighted' : ''
+          }`}
+          data-testid={dataTestid}
+          style={cellStyle}
+          onClick={onClick}
+          tabIndex={0}
+          type="button"
+        >
+          {}
+        </button>
+      </li>
+    )
+  }
+}
+
+export default Cell
