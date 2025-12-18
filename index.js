@@ -1,131 +1,76 @@
-import {Component} from 'react'
-import {Link} from 'react-router-dom'
-import {BiArrowBack} from 'react-icons/bi'
+import {Line} from 'rc-progress'
 import './index.css'
-import Cell from '../MemoryMatrixCell'
-import MemoryMatrixRulesPopup from '../MemoryMatrixRulesModal'
-import MemoryMatrixProgressBar from '../MemoryMatrixResultsPage'
 
-class MemoryMatrixGame extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      level: 0,
-      gridSize: 3,
-      array: [],
-      clickedCellsCount: 0,
-      showResults: false,
-    }
-  }
-
-  componentDidMount() {
-    const {level} = this.state
-    this.setGridCells(level)
-    this.timerId = setTimeout(() => this.goToResultsPage(), 8000)
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.timerId)
-  }
-
-  onClickPlayAgain = () => {
-    this.setState({
-      showResults: false,
-    })
-    this.componentDidMount()
-  }
-
-  setGridCells = size => {
-    const gridSize = size + 3
-    const totalCells = gridSize * gridSize
-    const numbersArray = Array.from({length: totalCells}, (_, index) => index)
-    const shuffledArray = numbersArray.sort(() => Math.random() - 0.5)
-
-    const randomIndices = new Set()
-    while (randomIndices.size < gridSize) {
-      randomIndices.add(Math.floor(Math.random() * totalCells))
-    }
-
-    const currentLevelGridCells = numbersArray.map(value => ({
-      id: Math.random().toString(),
-      isHidden: randomIndices.has(value),
-    }))
-
-    this.setState({
-      gridSize,
-      array: currentLevelGridCells,
-      clickedCellsCount: 0,
-    })
-  }
-
-  handleCellClick = index => {
-    const {array, gridSize, clickedCellsCount, level} = this.state
-    const updatedArray = [...array]
-    updatedArray[index].isClicked = true
-    if (updatedArray[index].isHidden) {
-      updatedArray[index].isHidden = false
-      if (clickedCellsCount + 1 === gridSize) {
-        this.setState(prevState => ({level: prevState.level + 1}))
-        this.setGridCells(level)
-      }
-    } else {
-      clearTimeout(this.timerId)
-      this.setState({showResults: true})
-    }
-    this.setState(prevState => ({
-      clickedCellsCount: prevState.clickedCellsCount + 1,
-      array: updatedArray,
-    }))
-    console.log(clickedCellsCount)
-  }
-
-  goToResultsPage = () => {
-    const {level} = this.state
-    this.setState({showResults: true})
-    this.setGridCells(level)
-  }
-
-  render() {
-    const {array, level, showResults, gridSize} = this.state
-
-    return showResults ? (
-      <MemoryMatrixProgressBar
-        level={level + 1}
-        onClickPlayAgain={this.onClickPlayAgain}
-      />
-    ) : (
-      <div className="memory-matrix-bg">
-        <div className="buttons-container">
-          <Link to="/">
-            <button className="back-btn" type="button">
-              <BiArrowBack color="#ffffff" />
-              <p>Back</p>
-            </button>
-          </Link>
-          <MemoryMatrixRulesPopup />
-        </div>
-        <h1 className="memory-matrix-heading">Memory Matrix</h1>
-        <p className="level-heading">Level - {level + 1}</p>
-        <ul
-          className="grid"
-          style={{gridTemplateColumns: `repeat(${gridSize}, 1fr)`}}
-        >
-          {array.map(({id, isHidden}, index) => (
-            <Cell
-              key={id}
-              isHidden={isHidden}
-              isClicked={array[index].isClicked}
-              data-testid={
-                array[index].isClicked ? 'highlighted' : 'notHighlighted'
-              }
-              onClick={() => this.handleCellClick(index)}
-              hiddenCellsDisplayTime={gridSize * 1000} // Example time calculation, adjust as needed
-            />
-          ))}
-        </ul>
+const MemoryMatrixProgressBar = props => {
+  const {level, onClickPlayAgain} = props
+  const percentage = (level * 100) / 15
+  return (
+    <div className="progressbar-bg">
+      <div className="progrssbar-emojis-container">
+        <img
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000742/05_Pokerface_xnvjfb.png"
+          alt="neutral face"
+          className="progressbar-emoji"
+        />
+        <img
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000801/07_Grimmace_n4lx7r.png"
+          alt="grimacing face"
+          className="progressbar-emoji"
+        />
+        <img
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000716/01_Smile_wuwllh.png"
+          alt="slightly smiling face"
+          className="progressbar-emoji"
+        />
+        <img
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000762/03_Optimistic_wzbf7s.png"
+          alt="grinning face with big eyes"
+          className="progressbar-emoji"
+        />
+        <img
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000826/04_Grin_rmlxkc.png"
+          alt="grinning face with smiling eyes"
+          className="progressbar-emoji"
+        />
+        <img
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000848/05_Laugh_qatkkp.png"
+          alt="beaming face with smiling eyes"
+          className="progressbar-emoji"
+        />
+        <img
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000870/02_Happy_fciroi.png"
+          alt="grinning face"
+          className="progressbar-emoji"
+        />
+        <img
+          src="https://res.cloudinary.com/dv6ikqksk/image/upload/v1711000891/02_Like_a_boss_cjrvqq.png"
+          alt="smiling face with sunglasses"
+          className="progressbar-emoji"
+        />
       </div>
-    )
-  }
+      <Line
+        percent={percentage}
+        strokeWidth={4}
+        strokeColor="blue"
+        className="progress-bar"
+      />
+      <div className="levels-container">
+        <p className="level-heading">level 1</p>
+        <p className="level-heading">level 5</p>
+        <p className="level-heading">level 10</p>
+        <p className="level-heading">level 15</p>
+      </div>
+      <h1 className="congratulations-heading">Congratulations</h1>
+      <h1 className="description-heading">You have reached level {level}</h1>
+      <button
+        type="button"
+        className="play-again-button"
+        onClick={onClickPlayAgain}
+      >
+        Play Again
+      </button>
+    </div>
+  )
 }
 
-export default MemoryMatrixGame
+export default MemoryMatrixProgressBar
