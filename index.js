@@ -2,78 +2,55 @@ import './index.css'
 
 import {Link} from 'react-router-dom'
 
-import {BiArrowBack} from 'react-icons/bi'
-
-import {useState} from 'react'
-import EmojiGameInterface from '../EmojiGameInterface'
-
-const EmojiGameRoute = () => {
-  const [gameActive, setgameActive] = useState(false)
-
-  const renderActiveness = () => {
-    setgameActive(!gameActive)
-  }
-
-  return (
-    <div className="emoji-route-container">
-      {gameActive ? (
-        <div className="game-interface">
-          <EmojiGameInterface />
-        </div>
-      ) : (
-        <>
-          <Link to="/" className="link-styling">
-            <button type="button" className="back-button-styling">
-              {' '}
-              <BiArrowBack /> Back
-            </button>
-          </Link>
-          <div className="rules-section">
+const Home = () => (
+  <div className="home-container">
+    <h1 className="games-heading">Games</h1>
+    <ul className="games-container">
+      <li className="home-list-item">
+        <Link to="/emoji-game" className="link-styling">
+          <div className="eachGame">
             <img
-              className="emoji-rule-image"
               src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729257912/Group_7471_w4hbbx.png"
               alt="emoji game"
             />
-            <h1 className="home-temp-heading">Emoji Game</h1>
-            <div className="rules-content-container">
-              <h2 className="rules-heading">Rules</h2>
-              <ul className="unordered-list-styling">
-                <li>User should be able to see the list of Emojis.</li>
-                <li>
-                  When the user clicks any one of the Emoji for the first time,
-                  then the count of the score should be incremented by 1 and the
-                  List of emoji cards should be shuffled.
-                </li>
-                <li>
-                  This process should be repeated every time the user clicks on
-                  an emoji card.
-                </li>
-                <li>
-                  When the user clicks on all Emoji cards without clicking any
-                  of it twice, then the user will win the game.
-                </li>
-                <li>
-                  When the user clicks on the same Emoji for the second time,
-                  then the user will lose the game.
-                </li>
-                <li>
-                  Once the game is over, the user will be redirected to the
-                  results page.
-                </li>
-              </ul>
-              <button
-                type="button"
-                className="start-button-styling"
-                onClick={renderActiveness}
-              >
-                Start Playing
-              </button>
-            </div>
           </div>
-        </>
-      )}
-    </div>
-  )
-}
+        </Link>
+      </li>
+      <li className="home-list-item">
+        <Link to="/memory-matrix" className="link-styling">
+          <div className="eachGame">
+            <h1 className="memory-matrix-heading">Memory Matrix</h1>
+            <img
+              src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729259272/memory_fv4c6f.png"
+              alt="memory matrix"
+            />
+          </div>
+        </Link>
+      </li>
+      <li className="home-list-item">
+        <Link to="/rock-paper-scissor" className="link-styling">
+          <div className="eachGame">
+            <h1 className="rock-paper-scissor">ROCK PAPER SCISSOR</h1>
+            <img
+              src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729259510/Group_7469_p76ztk.png"
+              alt="rock paper scissor"
+            />
+          </div>
+        </Link>
+      </li>
+      <li className="home-list-item">
+        <Link to="/card-flip-memory-game" className="link-styling">
+          <div className="eachGame">
+            <img
+              src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729259729/animals_fjhgr1.png"
+              alt="card flip memory game"
+              className="flip-home-icon"
+            />
+          </div>
+        </Link>
+      </li>
+    </ul>
+  </div>
+)
 
-export default EmojiGameRoute
+export default Home
