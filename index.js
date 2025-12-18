@@ -4,321 +4,134 @@ import {Link} from 'react-router-dom'
 
 import Modal from 'react-modal'
 
+import {v4 as uuidv4} from 'uuid'
+
 import {BiArrowBack} from 'react-icons/bi'
 
 import {CgClose} from 'react-icons/cg'
 
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 
-const gameStateConstants = {
-  initial: 'INITIAL',
-  activeState: 'ACTIVE',
-  wonState: 'WON',
-  lossState: 'LOST',
-  drawState: 'DRAW',
-}
+import EachAnimalCard from '../EachAnimalCard'
 
-const choicesList = [
+const cardsData = [
   {
-    id: 'rock',
-    imageUrl:
-      'https://assets.ccbp.in/frontend/react-js/rock-paper-scissor/rock-image.png',
+    name: 'tiger',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-tiger-img.png',
   },
   {
-    id: 'scissor',
-    imageUrl:
-      'https://assets.ccbp.in/frontend/react-js/rock-paper-scissor/scissor-image.png',
+    name: 'lion',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-lion-img.png',
   },
   {
-    id: 'paper',
-    imageUrl:
-      'https://assets.ccbp.in/frontend/react-js/rock-paper-scissor/paper-image.png',
+    name: 'rat',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-rat-img.png',
+  },
+  {
+    name: 'hen',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-hen-img.png',
+  },
+  {
+    name: 'elephant',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-elephant-img.png',
+  },
+  {
+    name: 'buffalo',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-buffalo-img.png',
+  },
+  {
+    name: 'goat',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-goat-img.png',
+  },
+  {
+    name: 'zebra',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-zebra-img.png',
+  },
+  {
+    name: 'duck',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-duck-img.png',
+  },
+  {
+    name: 'pigeon',
+    image:
+      'https://new-assets.ccbp.in/frontend/content/react-js/card-flip-memory/card-flip-memory-game-pigeon-img.png',
   },
 ]
 
-const RockPaperScissorRoute = () => {
-  const [gameStatus, setStatus] = useState(gameStateConstants.initial)
-  const [score, setSore] = useState(0)
-  const [yourOption, setYourOption] = useState({})
-  const [computerOption, setComputerOption] = useState({})
+const gameStatusConstants = {
+  active: 'ACTIVE',
+  response: 'RESPONSE',
+}
+
+const renderuniqueElements = () =>
+  [...cardsData, ...cardsData].map(eachItem => ({
+    id: uuidv4(),
+    name: eachItem.name,
+    imageurl: eachItem.image,
+    isFlipped: false,
+  }))
+
+const CardFlipMemoryGameInterface = () => {
+  const renderShuffleCards = () => {
+    const cardsdoubledData = renderuniqueElements()
+    return cardsdoubledData.sort(() => Math.random() - 0.5)
+  }
+
+  const [gameStatus, setGameStatus] = useState(gameStatusConstants.active)
+  const [shuffledCards, setShuffledCards] = useState(renderShuffleCards())
+  const [cardFlipCount, setCardFlipCount] = useState(0)
+  const [countDown, setCountDown] = useState(120)
+  const [score, setScore] = useState(0)
+  const [selectedCards, setSelectedCards] = useState([])
+  const [setMatchedCards] = useState(0)
   const [modalIsOpen, setModalIsOpen] = useState(false)
 
   const closeModal = () => {
     setModalIsOpen(false)
   }
+  console.log(selectedCards)
 
-  const renderScoreBoard = () => {
-    let scorealtimage = ' '
-    if (gameStatus === gameStateConstants.lossState) {
-      scorealtimage = 'Face without mouth'
-    } else if (gameStatus === gameStateConstants.wonState) {
-      scorealtimage = 'Smiling face with star eyes'
-    } else {
-      scorealtimage = 'Face without mouth'
+  const formatTime = time => {
+    const minutes = Math.floor(time / 60)
+    const seconds = time % 60
+    return `0${minutes}:${seconds > 9 ? `${seconds}` : `0${seconds}`}`
+  }
+
+  useEffect(() => {
+    if (countDown === 0) {
+      setGameStatus(gameStatusConstants.response)
     }
-    return (
-      <div className="scoreboard-container-styling">
-        <h1 className="rps-scoreboard-text-unorderedlist">
-          Rock
-          <br />
-          Paper
-          <br />
-          Scissor
-        </h1>
-        <img
-          src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729669525/Group_7618_wz7w1p.png"
-          alt={scorealtimage}
-          className="result-face"
-        />
-        <div className="score-text-container">
-          <p className="score-text">Score</p>
-          <p className="score-num">{score}</p>
-        </div>
-      </div>
-    )
-  }
 
-  const onPlayAgain = () => {
-    setStatus(gameStateConstants.activeState)
-    setYourOption({})
-    setComputerOption({})
-  }
+    const timerId =
+      countDown > 0 && setInterval(() => setCountDown(prev => prev - 1), 1000)
+    return () => clearInterval(timerId)
+  }, [countDown, gameStatus])
 
-  const renderDrawState = () => (
-    <div className="response-container">
-      <h1 className="rps-heading-styling">ROCK PAPER SCISSOR</h1>
-      {renderScoreBoard()}
-      <div className="response-status-container-unordered-list">
-        <div className="each-response-section">
-          <h3 className="player-name">You</h3>
-          <img
-            src={yourOption.imageUrl}
-            alt={yourOption.id}
-            className="response-emoji"
-          />
-        </div>
-        <div className="each-response-section">
-          <img
-            src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729682268/Emoji_ta4me1.png"
-            alt="draw emoji"
-            className="response-icon"
-          />
-          <p className="response-text">IT IS DRAW</p>
-          <button
-            type="button"
-            className="play-again-button"
-            onClick={onPlayAgain}
-          >
-            Play Again
-          </button>
-        </div>
-        <div className="each-response-section">
-          <h3 className="player-name">Opponent</h3>
-          <img
-            src={computerOption.imageUrl}
-            alt={computerOption.id}
-            className="response-emoji"
-          />
-        </div>
-      </div>
-    </div>
-  )
-
-  const renderWonState = () => (
-    <div className="response-container">
-      <h1 className="rps-heading-styling">ROCK PAPER SCISSOR</h1>
-      {renderScoreBoard()}
-      <div className="response-status-container-unordered-list">
-        <div className="each-response-section">
-          <h3 className="player-name">You</h3>
-          <img
-            src={yourOption.imageUrl}
-            alt={yourOption.id}
-            className="response-emoji"
-          />
-        </div>
-        <div className="each-response-section">
-          <img
-            src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729682935/Emoji_1_cplewm.png"
-            alt="won emoji"
-            className="response-icon"
-          />
-          <p className="response-text">YOU WON</p>
-          <button
-            type="button"
-            className="play-again-button"
-            onClick={onPlayAgain}
-          >
-            Play Again
-          </button>
-        </div>
-        <li className="each-response-section">
-          <h3 className="player-name">Opponent</h3>
-          <img
-            src={computerOption.imageUrl}
-            alt={computerOption.id}
-            className="response-emoji"
-          />
-        </li>
-      </div>
-    </div>
-  )
-
-  const renderLossState = () => (
-    <div className="response-container">
-      <h1 className="rps-heading-styling">ROCK PAPER SCISSOR</h1>
-      {renderScoreBoard()}
-      <div className="response-status-container-unordered-list">
-        <div className="each-response-section">
-          <h3 className="player-name">You</h3>
-          <img
-            src={yourOption.imageUrl}
-            alt={yourOption.id}
-            className="response-emoji"
-          />
-        </div>
-        <div className="each-response-section">
-          <img
-            src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729683488/Emoji_3_s4c8bv.png"
-            alt="lose emoji"
-            className="response-icon"
-          />
-          <p className="response-text">YOU LOSE</p>
-          <button
-            type="button"
-            className="play-again-button"
-            onClick={onPlayAgain}
-          >
-            Play Again
-          </button>
-        </div>
-        <div className="each-response-section">
-          <h3 className="player-name">Opponent</h3>
-          <img
-            src={computerOption.imageUrl}
-            alt={computerOption.id}
-            className="response-emoji"
-          />
-        </div>
-      </div>
-    </div>
-  )
-
-  const onSelectionChoice = eachItem => {
-    const yourChoice = eachItem
-    setYourOption(yourChoice)
-    const generatedChoice =
-      choicesList[Math.floor(Math.random() * choicesList.length)]
-    setComputerOption(generatedChoice)
-
-    if (yourChoice.id === generatedChoice.id) {
-      setStatus(gameStateConstants.drawState)
-    } else if (
-      (yourChoice.id === 'rock' && generatedChoice.id === 'scissor') ||
-      (yourChoice.id === 'scissor' && generatedChoice.id === 'paper') ||
-      (yourChoice.id === 'paper' && generatedChoice.id === 'rock')
-    ) {
-      setStatus(gameStateConstants.wonState)
-      setSore(prevScore => prevScore + 1)
-    } else {
-      setStatus(gameStateConstants.lossState)
-      setSore(prevScore => prevScore - 1)
-    }
-  }
-
-  const onStartGame = () => {
-    setStatus(gameStateConstants.activeState)
-  }
-
-  const renderInitialState = () => (
-    <div className="initial-container">
-      <Link to="/" className="rps-link-styling">
-        <button type="button" className="rps-back-button-styling">
-          {' '}
-          <BiArrowBack /> Back
-        </button>
-      </Link>
-      <h1 className="rps-heading-styling">ROCK PAPER SCISSOR</h1>
-      <img
-        src="https://res.cloudinary.com/dvptfc0ji/image/upload/v1729656991/Group_7469_1_rijazz.png"
-        alt="rock paper scissor"
-        className="rps-image"
-      />
-      <h1 className="rules-text">Rules</h1>
-      <ul className="rps-rules-unordered-styling">
-        <li className="list-item-styling">
-          The game result should be based on user and user opponent choices
-        </li>
-        <li className="list-item-styling">
-          When the user choice is rock and his opponent choice is rock then the
-          result will be <span className="span-styling">IT IS DRAW</span>
-        </li>
-        <li className="list-item-styling">
-          When the user choice is paper and his opponent choice is rock then the
-          result will be <span className="span-styling">YOU WON</span>
-        </li>
-        <li className="list-item-styling">
-          When the user choice is a scissor and his opponent choice is rock then
-          the result will be
-          <span className="span-styling">YOU LOSE</span>
-        </li>
-        <li className="list-item-styling">
-          When the user choice is paper and his opponent choice is paper then
-          the result will be <span className="span-styling">IT IS DRAW</span>
-        </li>
-        <li className="list-item-styling">
-          When the user choice is scissors and his opponent choice is paper then
-          the result will be <span className="span-styling">YOU WON</span>
-        </li>
-        <li className="list-item-styling">
-          When the user choice is rock and his opponent choice is scissors then
-          the result will be <span className="span-styling">YOU WON</span>
-        </li>
-        <li className="list-item-styling">
-          When the user choice is paper and his opponent choice is scissors then
-          the result will be <span className="span-styling">YOU LOSE</span>
-        </li>
-        <li className="list-item-styling">
-          When the user choice is scissors and his opponent choice is scissors
-          then the result will be{' '}
-          <span className="span-styling">IT IS DRAW</span>
-        </li>
-        <li className="list-item-styling">
-          When the result is <span className="span-styling">YOU WON</span>, then
-          the count of the score should be incremented by 1
-        </li>
-        <li className="list-item-styling">
-          When the result is <span className="span-styling">IT IS DRAW</span>,
-          then the count of the score should be the same
-        </li>
-        <li className="list-item-styling">
-          When the result is <span className="span-styling">YOU LOSE</span>,
-          then the count of the score should be decremented by 1.
-        </li>
-      </ul>
-      <button className="rps-start-button" type="button" onClick={onStartGame}>
-        Start Playing
-      </button>
-    </div>
-  )
-
-  const renderActiveStateTopSection = () => (
-    <div className="rps-back-popup-container">
-      <Link to="/" className="rps-active-state-link-styling">
-        <button type="button" className="rps-back-button-styling">
-          {' '}
-          <BiArrowBack /> Back
+  const renderActiveTopSection = () => (
+    <div className="cfm-activestate-top-container">
+      <Link to="/" className="link-styling">
+        <button type="button" className="cfm-initial-Back-button">
+          <BiArrowBack color="#ffffff" /> Back
         </button>
       </Link>
       <button
         type="button"
-        className="rps-active-state-rules-button"
+        className="cfm-active-state-rules-button"
         onClick={() => setModalIsOpen(true)}
       >
         Rules
       </button>
       <Modal
-        className="rps-popup-rules-container"
+        className="cfm-popup-rules-container"
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Emoji Game Rules"
@@ -327,115 +140,170 @@ const RockPaperScissorRoute = () => {
         <button
           type="button"
           data-testid="close"
-          className="rps-active-rules-close-button"
+          className="cfm-active-rules-close-button"
           onClick={closeModal}
           aria-label="close"
         >
           <CgClose color="#334155" aria-label="close" />
         </button>
-        <h1 className="rps-active-state-rules-state">Rules</h1>
-        <ul className="rps-rules-unordered-styling">
-          <li className="rps-active-state-list-item-styling">
-            The game result should be based on user and user opponent choices
+        <h1 className="cfm-active-state-rules-text">Rules</h1>
+        <ul className="cfm-inital-rules-unordered-styling">
+          <li className="cfm-active-rules-list-item-styling">
+            When the game is started, the users should be able to see the list
+            of Cards that are shuffled and turned face down.
           </li>
-          <li className="rps-active-state-list-item-styling">
-            When the user choice is rock and his opponent choice is rock then
-            the result will be <span className="span-styling">IT IS DRAW</span>
+          <li className="cfm-active-rules-list-item-styling">
+            Users should be able to compare only two cards at a time.
           </li>
-          <li className="rps-active-state-list-item-styling">
-            When the user choice is paper and his opponent choice is rock then
-            the result will be <span className="span-styling">YOU WON</span>
+          <li className="cfm-active-rules-list-item-styling">
+            When a user starts the game, the user should be able to see the
+            Timer running.
           </li>
-          <li className="rps-active-state-list-item-styling">
-            When the user choice is a scissor and his opponent choice is rock
-            then the result will be
-            <span className="span-styling">YOU LOSE</span>
+          <li className="cfm-active-rules-list-item-styling">
+            When the user is not able to find all the cards before the timer
+            ends then the game should end and redirect to the Time Up Page.
           </li>
-          <li className="rps-active-state-list-item-styling">
-            When the user choice is paper and his opponent choice is paper then
-            the result will be <span className="span-styling">IT IS DRAW</span>
+          <li className="cfm-active-rules-list-item-styling">
+            The Timer starts from 2 Minutes.
           </li>
-          <li className="rps-active-state-list-item-styling">
-            When the user choice is scissors and his opponent choice is paper
-            then the result will be{' '}
-            <span className="span-styling">YOU WON</span>
+          <li className="cfm-active-rules-list-item-styling">
+            If the user finds all the matching cards before the timer ends, then
+            the user should be redirected to the results page.
           </li>
-          <li className="rps-active-state-list-item-styling">
-            When the user choice is rock and his opponent choice is scissors
-            then the result will be{' '}
-            <span className="span-styling">YOU WON</span>
-          </li>
-          <li className="rps-active-state-list-item-styling">
-            When the user choice is paper and his opponent choice is scissors
-            then the result will be{' '}
-            <span className="span-styling">YOU LOSE</span>
-          </li>
-          <li className="rps-active-state-list-item-styling">
-            When the user choice is scissors and his opponent choice is scissors
-            then the result will be{' '}
-            <span className="span-styling">IT IS DRAW</span>
-          </li>
-          <li className="rps-active-state-list-item-styling">
-            When the result is <span className="span-styling">YOU WON</span>,
-            then the count of the score should be incremented by 1
-          </li>
-          <li className="rps-active-state-list-item-styling">
-            When the result is <span className="span-styling">IT IS DRAW</span>,
-            then the count of the score should be the same
-          </li>
-          <li className="rps-active-state-list-item-styling">
-            When the result is <span className="span-styling">YOU LOSE</span>,
-            then the count of the score should be decremented by 1.
+          <li className="cfm-active-rules-list-item-styling">
+            If the two cards have the same image, they remain face up. If not,
+            they should be flipped face down again after a short 2 seconds.
           </li>
         </ul>
       </Modal>
     </div>
   )
 
-  const renderActiveState = () => (
-    <div className="rps-active-state-container">
-      {renderActiveStateTopSection()}
-      <h1 className="rps-heading-styling">ROCK PAPER SCISSOR</h1>
-      <h1 className="active-state-lets-pick">Lets pick</h1>
-      {renderScoreBoard()}
-      <div className="rps-icons-unordered-list">
-        {choicesList.map(eachItem => (
-          <button
-            data-testid={`${eachItem.id}Button`}
-            className="each-icon-button"
-            type="button"
-            onClick={() => onSelectionChoice(eachItem)}
-            key={eachItem.id}
-          >
-            <img
-              src={eachItem.imageUrl}
-              alt={eachItem.id}
-              className="rps-icons-styling"
-            />
-          </button>
-        ))}
+  const flipTheCard = card =>
+    shuffledCards.map(eachItem =>
+      eachItem.id === card.id
+        ? {...eachItem, isFlipped: !eachItem.isFlipped}
+        : eachItem,
+    )
+
+  const onHandleCardClick = card => {
+    setCardFlipCount(prev => prev + 1)
+    setShuffledCards(flipTheCard(card))
+    if (selectedCards.length === 2) {
+      return
+    }
+    setSelectedCards(prev => [...prev, card])
+    if (selectedCards.length === 1) {
+      console.log('selected length 2')
+      const firstCard = selectedCards[0]
+      if (firstCard.name === card.name) {
+        setMatchedCards(prev => prev + 1)
+        setScore(prev => prev + 1)
+        setSelectedCards([])
+        if (score === shuffledCards.length / 2) {
+          setGameStatus(gameStatusConstants.response)
+        }
+      } else {
+        setTimeout(() => {
+          setShuffledCards(
+            shuffledCards.map(eachItem =>
+              eachItem.id === firstCard.id || eachItem.id === firstCard.id
+                ? {...eachItem, isFlipped: !eachItem.isFlipped}
+                : eachItem,
+            ),
+          )
+          console.log('time out initiated')
+          setSelectedCards([])
+        }, 2000)
+      }
+    }
+  }
+
+  const renderActiveStateSection = () => (
+    <>
+      {renderActiveTopSection()}
+      <h1 className="cfm-active-state-heading">Card-Flip Memory Game</h1>
+      <div className="active-state-score-time-unordered-list">
+        <p className="active-state-score-list-detail">
+          Card flip count -{' '}
+          {cardFlipCount > 9 ? `${cardFlipCount}` : `0${cardFlipCount}`}
+        </p>
+        <p className="active-state-time-list-detail">{formatTime(countDown)}</p>
+        <p className="active-state-score-list-detail">
+          Score - {score > 9 ? score : `0${score}`}
+        </p>
       </div>
-    </div>
+      <div className="cfm-game-container">
+        <ul className="animal-cards-unorder-list-styling">
+          {shuffledCards.map(eachItem => (
+            <EachAnimalCard
+              eachItem={eachItem}
+              key={eachItem.id}
+              handleClick={onHandleCardClick}
+              testid="cardsData"
+            />
+          ))}
+        </ul>
+      </div>
+    </>
   )
 
-  const renderRPSgame = () => {
+  const onPlayAgainButton = () => {
+    setGameStatus(gameStatusConstants.active)
+    setShuffledCards(renderShuffleCards())
+    setCardFlipCount(0)
+    setCountDown(120)
+    setScore(0)
+    setSelectedCards([])
+    setMatchedCards(0)
+  }
+
+  const responseSection = () => {
+    const happyEmoji =
+      'https://res.cloudinary.com/dvptfc0ji/image/upload/v1729927729/2x_csj9y0.png'
+    const sadEmoji =
+      'https://res.cloudinary.com/dvptfc0ji/image/upload/v1729927830/thfj8loqatlejhcjmh0q.png'
+    const happyemojialt = 'grinning face with big eyes'
+    const sadEmojialt = 'neutral face'
+    return (
+      <div className="result-response-container">
+        <img
+          className="result-response-emoji"
+          src={score > 10 ? happyEmoji : sadEmoji}
+          alt={score > 10 ? happyemojialt : sadEmojialt}
+        />
+        <h1 className="congratulation-response-text">
+          {score > 9 ? 'Congratulations' : 'Better luck next time'}
+        </h1>
+        <p className="no-of-flips-text">No.of Flips - {cardFlipCount}</p>
+        <p className="response-descripton">
+          {score > 9
+            ? 'You matched all of the cards in record time'
+            : 'You did not match all of the cards in record time'}
+        </p>
+        <button
+          type="button"
+          className="cfm-response-button"
+          onClick={onPlayAgainButton}
+        >
+          Play Again
+        </button>
+      </div>
+    )
+  }
+
+  const renderGame = () => {
     switch (gameStatus) {
-      case gameStateConstants.initial:
-        return renderInitialState()
-      case gameStateConstants.activeState:
-        return renderActiveState()
-      case gameStateConstants.drawState:
-        return renderDrawState()
-      case gameStateConstants.wonState:
-        return renderWonState()
-      case gameStateConstants.lossState:
-        return renderLossState()
+      case gameStatusConstants.active:
+        return renderActiveStateSection()
+      case gameStatusConstants.response:
+        return responseSection()
       default:
         return 'none'
     }
   }
 
-  return <div className="rps-game-container-bg">{renderRPSgame()}</div>
+  return <div className="cfm-active-state-container">{renderGame()}</div>
 }
 
-export default RockPaperScissorRoute
+export default CardFlipMemoryGameInterface
