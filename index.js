@@ -1,32 +1,24 @@
 import './index.css'
 
-const EachAnimalCard = props => {
-  const {eachItem, handleClick} = props
-  const {name, imageurl, isFlipped} = eachItem
+const EachEmoji = props => {
+  const {eachItem, onSelection} = props
+  const {id, emojiName, emojiUrl} = eachItem
 
-  const onSelection = () => {
-    handleClick(eachItem)
+  const initateTrigger = () => {
+    onSelection(id)
   }
-
-  const footPrint =
-    'https://res.cloudinary.com/dvptfc0ji/image/upload/v1729879910/foot-print_1_sut6kl.png'
-
   return (
-    <li
-      className={
-        isFlipped
-          ? 'animal-visible-card-styling'
-          : 'animal-invisible-card-styling'
-      }
-    >
-      <img
-        src={isFlipped ? `${imageurl}` : `${footPrint}`}
-        alt={name}
-        className="animal-image"
-        onClick={onSelection}
-      />
+    <li className="game-emojis-container">
+      <button type="button" className="each-emoji-icon-button">
+        <img
+          src={emojiUrl}
+          alt={emojiName}
+          className="game-emoji-icon"
+          onClick={initateTrigger}
+        />
+      </button>
     </li>
   )
 }
 
-export default EachAnimalCard
+export default EachEmoji
